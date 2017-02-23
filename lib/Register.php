@@ -35,8 +35,8 @@ class Register
         $definitions->addDefinition($managerDefinition);
 
         $testCase->setTypePreference(
-            ConfigurationReader::class,
-            \Magium\ConfigurationBridge\ConfigurationReader::class
+            ConfigurationProviderInterface::class,
+            ConfigurationProvider::class
         );
         $provider = $testCase->get(ConfigurationProvider::class);
         if ($provider instanceof ConfigurationProvider) {
