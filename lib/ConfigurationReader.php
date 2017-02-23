@@ -2,26 +2,34 @@
 
 namespace Magium\ConfigurationBridge;
 
+use Magium\Configuration\Config\BuilderInterface;
 use Magium\Configuration\Config\Config;
-use Magium\Configuration\MagiumConfigurationFactoryInterface;
+use Magium\Configuration\Manager\ManagerInterface;
 use Magium\Util\Configuration\ConfigurableObjectInterface;
 use Magium\Util\Configuration\ConfigurationCollector\Property;
 
 class ConfigurationReader extends \Magium\Util\Configuration\ConfigurationReader
 {
 
-    protected $factory;
+    protected $manager;
+    protected $builder;
     protected $context = Config::CONTEXT_DEFAULT;
 
-    public function __construct(MagiumConfigurationFactoryInterface $factory)
+    public function __construct(ManagerInterface $manager, BuilderInterface $builder)
     {
-        $this->factory = $factory;
+        $this->manager = $manager;
+        $this->builder = $builder;
+    }
+
+    public function getConfiguration()
+    {
+        return $this->manager->getConfiguration($this->context);
     }
 
     public function configure(ConfigurableObjectInterface $config)
     {
-        $manager = $this->factory->getManager();
-        $configuration = $manager->getConfiguration($this->context);
+
+        $configuration = $this->getConfiguration();
         $options = $config->getDeclaredOptions();
         $keyBase = get_class($config);
         $keyBase = str_replace('\\', '_', $keyBase);
@@ -30,8 +38,11 @@ class ConfigurationReader extends \Magium\Util\Configuration\ConfigurationReader
                 $param = $param->getName();
             }
             $path = sprintf('magium/selenium/%s_%s', $keyBase, $param);
-            $value = $configuration->getValue($path);
-            $config->set($param, $value);
+
+            if ($configuration->hasValue($path)) {
+                $value = $configuration->getValue($path);
+                $config->set($param, $value);
+            }
         }
     }
 
