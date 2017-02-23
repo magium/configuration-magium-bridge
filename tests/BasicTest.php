@@ -9,33 +9,14 @@ use Magium\Configuration\Config\ConfigInterface;
 use Magium\Configuration\MagiumConfigurationFactoryInterface;
 use Magium\Configuration\Manager\Manager;
 use Magium\Configuration\Manager\ManagerInterface;
-use Magium\ConfigurationBridge\ConfigurationProvider as BridgeConfigurationProvider;
 use Magium\ConfigurationBridge\ConfigurationReader;
 use Magium\ConfigurationBridge\Register;
+use Magium\TestCase\Initializer;
 use Magium\Util\Configuration\ConfigurationCollector\Property;
-use Magium\Util\Configuration\ConfigurationProviderInterface;
 use PHPUnit\Framework\TestCase;
-use Zend\Di\Config;
-use Zend\Di\Di;
 
 class BasicTest extends TestCase
 {
-
-    public function testGetBridgeReader()
-    {
-        $factory = $this->createMock(MagiumConfigurationFactoryInterface::class);
-        $test = $this->getMockBuilder(AbstractTestCase::class)->setMethods(null)->getMock();
-        $di = new Di();
-        $config = new Config([]);
-        $config->configure($di);
-        $di->instanceManager()->addSharedInstance($this->createMock(Builder::class), BuilderInterface::class);
-        $di->instanceManager()->addSharedInstance($this->createMock(Manager::class), ManagerInterface::class);
-        $test->setDi($di);
-        (new Register())->register($test, $factory);
-        // Does the switcheroo happen?  (from Register)
-        $instance = $test->get(ConfigurationProviderInterface::class);
-        self::assertInstanceOf(BridgeConfigurationProvider::class, $instance);
-    }
 
     public function testNonElementIsNotMatched()
     {
@@ -74,6 +55,25 @@ class BasicTest extends TestCase
         $instance = $reader->getConfiguration();
         self::assertInstanceOf(\Magium\Configuration\Config\Config::class, $instance);
 
+    }
+
+    public function testRegisterProperlyWiresDiForTheConfigurationReader()
+    {
+        $testCase = $this->getMockBuilder(AbstractTestCase::class)->setMethods(null)->getMock();
+        $manager = $this->createMock(ManagerInterface::class);
+        $builder = $this->createMock(BuilderInterface::class);
+        $factory = $this->createMock(MagiumConfigurationFactoryInterface::class);
+        $factory->expects(self::once())->method('getManager')->willReturn($manager);
+        $factory->expects(self::once())->method('getBuilder')->willReturn($builder);
+
+        $initializer = new Initializer();
+        $initializer->initialize($testCase);
+
+        (new Register())->register($testCase, $factory);
+        $configurationReader = $testCase->get(\Magium\Util\Configuration\ConfigurationReader::class);
+
+        // It is important to get the configuration configuration reader when requesting the original.
+        self::assertInstanceOf(ConfigurationReader::class, $configurationReader);
     }
 
     public function testReader()
