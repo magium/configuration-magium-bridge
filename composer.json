@@ -17,6 +17,9 @@
     "psr-4": {
       "Magium\\ConfigurationBridge\\": "lib",
       "Magium\\ConfigurationBridge\\Tests\\": "tests"
-    }
+    },
+    "files": [
+      "registration.php"
+    ]
   }
 }

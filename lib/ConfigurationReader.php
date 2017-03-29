@@ -3,7 +3,7 @@
 namespace Magium\ConfigurationBridge;
 
 use Magium\Configuration\Config\BuilderInterface;
-use Magium\Configuration\Config\Config;
+use Magium\Configuration\Config\ConfigurationRepository;
 use Magium\Configuration\Manager\ManagerInterface;
 use Magium\Util\Configuration\ConfigurableObjectInterface;
 use Magium\Util\Configuration\ConfigurationCollector\Property;
@@ -13,7 +13,7 @@ class ConfigurationReader extends \Magium\Util\Configuration\ConfigurationReader
 
     protected $manager;
     protected $builder;
-    protected $context = Config::CONTEXT_DEFAULT;
+    protected $context = ConfigurationRepository::CONTEXT_DEFAULT;
 
     public function __construct(ManagerInterface $manager, BuilderInterface $builder)
     {
