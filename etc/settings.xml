@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<magiumConfiguration xmlns="http://www.magiumlib.com/Configuration">
+    <section identifier="magium">
+        <group identifier="selenium">
+            <element identifier="Magium_TestCaseConfiguration_webDriverRemote">
+                <value>http://localhost:4444/wd/hub</value>
+            </element>
+        </group>
+    </section>
+</magiumConfiguration>
